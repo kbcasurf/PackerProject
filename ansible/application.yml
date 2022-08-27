@@ -4,16 +4,16 @@
   become_user: root
   become_method: sudo
   tasks:
-    - name: Enable nginx for amazon linux 2
+    - name: Habilita repositório Nginx Amazon Linux 2
       shell: "amazon-linux-extras enable nginx1.12"
       become: yes
 
-    - name: Install nginx
+    - name: Instalação do Nginx
       yum:
         name: nginx
         state: latest
 
-    - name: Install php
+    - name: Instalação do PHP
       yum:
         name: '{{item}}'
         state: latest
@@ -26,89 +26,89 @@
         - php-mysql
         - php-fpm
     
-    - name: Copy php config files
+    - name: Cópia dos arquivos de configuração do PHP
       copy:
         src: "./files/php.conf"
         dest: "/etc/php-fpm.d/www.conf"
         mode: 0644
 
-    - name: set the right permissions to php directories
+    - name: Seta permissão nos repositórios PHP
       file:
         path: /var/lib/php
         owner: root
         group: nginx
 
-    - name: Enable php-fpm
+    - name: Habilita PHP-FPM
       service: name=php-fpm enabled=yes
       become: yes
     
-    - name: start php-fpm
+    - name: Inicialização do PHP-FPM
       service:
         name: php-fpm
         state: started
 
-    - name: Copy nginx config files
+    - name: Cópia dos arquivos de configuração do Nginx
       copy:
         src: "./files/nginx.conf"
         dest: "/etc/nginx/nginx.conf"
         mode: 0644
 
-    - name: Creates directory
+    - name: Criação de diretórios
       file: 
         path: "/var/www/app"
         state: directory
 
-    - name: make the build package
+    - name: Compactação de pacote
       local_action: shell tar -c -z -f app.zip -C ./files/php .
       become: no
 
-    - name: Copy build package
+    - name: Cópia do pacote compactado
       copy:
         src: "app.zip"
-        dest: "/home/ec2-user/app.zip"
+        dest: "/home/paschoal/app.zip"
 
-    - name: unpack build package
-      shell: "tar -xf /home/ec2-user/app.zip -C /var/www/app"
+    - name: Descompactação do pacote
+      shell: "tar -xf /home/paschoal/app.zip -C /var/www/app"
     
-    - name: set the right permissions to app directories
+    - name: Configuração de permissões no diretório da aplicação
       file:
         path: /var/www/app
         owner: root
         group: nginx
 
-    - name: Update application nginx config
+    - name: Atualização do arquivo de configuração do Nginx
       copy: 
         src: "./files/application.conf"
         dest: "/etc/nginx/conf.d/app.conf"
         mode: 0644
 
-    - name: Enable Nginx
+    - name: Habilita serviço Nginx
       service: name=nginx enabled=yes
       become: yes
     
-    - name: restart nginx
+    - name: Reinicia Nginx
       service:
         name: nginx
         state: restarted
 
-    - name: Enable mariadb for amazon linux 2
+    - name: Habilita repositório MariaDB no Amazon Linux 2 
       shell: "amazon-linux-extras enable mariadb10.5"
       become: yes
 
-    - name: Install mariadb
+    - name: Instalação do MariaDB
       yum:
         name: mariadb
         state: latest
 
-    - name: start mariadb
+    - name: Inicialização do MariaDB
       shell: "systemctl start mariadb"
       become: yes
 
-    - name: enable mariadb service
+    - name: Habilita serviço MariaDB
       shell: "systemctl enable mariadb"
       become: yes
 
-    - name: Recreate database
+    - name: Recria a base de dados do MariaDB
       shell:
         cmd: |
           mariadb <<EOF
@@ -118,10 +118,10 @@
           CREATE USER user_manager IDENTIFIED BY 'Qwerty123';
           GRANT ALL PRIVILEGES ON user_inventory.* TO user_manager;
           EOF
-    - name: Copy DB DDL file
+    - name: Copia os arquivos DB DDL
       copy:
         src: "./files/user_management.sql"
         dest: "/home/ec2-user/user_management.sql"
         mode: 0644
     - name: Build database tables
-      shell: "mariadb user_inventory < /home/ec2-user/user_management.sql"
+      shell: "mariadb user_inventory < /home/paschoal/user_management.sql"
