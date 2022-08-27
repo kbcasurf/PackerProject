@@ -1,4 +1,3 @@
-# OpenSCAP + Ansible
-Project made to run OpenSCAP evaluation over RedHat9 servers, create a remediation file and apply solution created on them.
-This was my job for the lecture "Blindando Servers e Containers com OpenSCAP + Ansible" (Shielding Servers and
-Containers with OpenSCAP + Ansible).
+# Build a Golden Image Pipeline with HCP Packer
+
+This repo is a companion to the [Build a Golden Image Pipeline with HCP Packer](https://learn.hashicorp.com/tutorials/packer/golden-image-with-hcp-packer) tutorial, containing configuration files to create golden virtual machine (VM) images and customize them for downstream usage.
